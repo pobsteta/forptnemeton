@@ -4,12 +4,20 @@
 \alias{forpt_weights}
 \title{Download the pretrained ForPT backbone}
 \usage{
-forpt_weights(cache_dir = forpt_cache_dir(), overwrite = FALSE)
+forpt_weights(
+  cache_dir = forpt_cache_dir(),
+  overwrite = FALSE,
+  fichier = .FORPT_WEIGHTS
+)
 }
 \arguments{
 \item{cache_dir}{Directory. Default \code{\link[=forpt_cache_dir]{forpt_cache_dir()}}.}
 
 \item{overwrite}{Logical. Download again.}
+
+\item{fichier}{Path of the checkpoint inside the Hugging Face repository.
+Default: the pretrained backbone (\code{forpt_info()$weights_file}); the age
+head of \code{\link[=forpt_age]{forpt_age()}} is \code{forpt_info()$age_weights_file}.}
 }
 \value{
 Path of the checkpoint, invisibly.

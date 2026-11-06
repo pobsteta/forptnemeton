@@ -6,7 +6,8 @@
 #'
 #' @return A list: `version` of the embedding recipe, `dimensions` (504),
 #'   `grid_size` (0.05 m), `hf_repo`, `weights_file` (path of the pretrained
-#'   backbone inside the Hugging Face repository).
+#'   backbone inside the Hugging Face repository), `age_weights_file` (the
+#'   fine-tuned age head of [forpt_age()]).
 #' @export
 forpt_info <- function() {
   list(
@@ -14,13 +15,15 @@ forpt_info <- function() {
     dimensions = .FORPT_DIM,
     grid_size = 0.05,
     hf_repo = "prs-eth/ForPT",
-    weights_file = .FORPT_WEIGHTS
+    weights_file = .FORPT_WEIGHTS,
+    age_weights_file = .FORPT_AGE_WEIGHTS
   )
 }
 
 .FORPT_VERSION <- "forpt-ssl-epoch30-mean-v1"
 .FORPT_DIM <- 504L
 .FORPT_WEIGHTS <- "00_ssl_pretrain/pretrain-forpt/model/epoch_30.pth"
+.FORPT_AGE_WEIGHTS <- "04_forage/age-forpt-ft-p100/model/model_best.pth"
 
 #' Default cache directory
 #'
@@ -60,16 +63,20 @@ forpt_environment <- function() {
 #'
 #' @param cache_dir Directory. Default [forpt_cache_dir()].
 #' @param overwrite Logical. Download again.
+#' @param fichier Path of the checkpoint inside the Hugging Face repository.
+#'   Default: the pretrained backbone (`forpt_info()$weights_file`); the age
+#'   head of [forpt_age()] is `forpt_info()$age_weights_file`.
 #' @return Path of the checkpoint, invisibly.
 #' @export
-forpt_weights <- function(cache_dir = forpt_cache_dir(), overwrite = FALSE) {
-  dest <- file.path(cache_dir, "weights", .FORPT_WEIGHTS)
+forpt_weights <- function(cache_dir = forpt_cache_dir(), overwrite = FALSE,
+                          fichier = .FORPT_WEIGHTS) {
+  dest <- file.path(cache_dir, "weights", fichier)
   if (file.exists(dest) && !overwrite) return(invisible(dest))
   if (!.forpt_reticulate_ok()) {
     cli::cli_abort("{.pkg reticulate} is required to download the ForPT weights.")
   }
   hf <- reticulate::import("huggingface_hub")
-  chemin <- hf$hf_hub_download(repo_id = "prs-eth/ForPT", filename = .FORPT_WEIGHTS,
+  chemin <- hf$hf_hub_download(repo_id = "prs-eth/ForPT", filename = fichier,
                                local_dir = file.path(cache_dir, "weights"))
   cli::cli_alert_info("ForPT weights: check the licence on {.url https://huggingface.co/prs-eth/ForPT}.")
   invisible(chemin)

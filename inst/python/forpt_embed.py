@@ -119,3 +119,62 @@ def embed_cells(model, cells, batch_size=16, device="cuda"):
             )
         out[start:start + len(chunk)] = feat.float().cpu().numpy()
     return out
+
+
+# --------------------------------------------------------------------------
+# Tete d'age (FORage) : modele affine ForPT, un arbre par echantillon.
+
+AGE_WEIGHTS = "04_forage/age-forpt-ft-p100/model/model_best.pth"
+AGE_MAX_POINTS = 8192
+
+
+def load_age_model(weights_path, device="cuda"):
+    """DefaultReggressor (LitePT-S + tete MLP) charge depuis model_best.pth."""
+    import torch
+    import forpt.models  # noqa: F401
+    from forpt.models import build_model
+
+    cfg = dict(type="DefaultReggressor", num_targets=1, backbone_embed_dim=EMBED_DIM,
+               criteria=None, backbone=dict(BACKBONE))
+    model = build_model(cfg)
+    ckpt = torch.load(weights_path, map_location="cpu", weights_only=False)
+    state = ckpt.get("state_dict", ckpt)
+    weight = {(k[7:] if k.startswith("module.") else k): v for k, v in state.items()}
+    model.load_state_dict(weight, strict=True)
+    model.to(device).eval()
+    return model
+
+
+def predict_ages(model, trees, batch_size=16, device="cuda"):
+    """Age predit (annees) pour une liste de nuages d'arbres (tableaux n x 3).
+
+    Le pretraitement de la configuration FORage ne recentre pas : les nuages
+    sont passes tels que les donne R (recentres en x, y sur l'arbre, z =
+    hauteur au-dessus du sol).
+    """
+    import torch
+    from forpt.datasets.transform import Compose
+    from forpt.datasets.utils import point_collate_fn
+
+    transform = Compose([
+        dict(type="GridSample", grid_size=GRID_SIZE, hash_type="fnv", mode="train",
+             return_grid_coord=True),
+        dict(type="ToTensor"),
+        dict(type="Collect", keys=("coord", "grid_coord"), feat_keys=["coord"]),
+    ])
+    rng = np.random.default_rng(0)
+    out = np.full(len(trees), np.nan, dtype=np.float32)
+    for start in range(0, len(trees), batch_size):
+        chunk = trees[start:start + batch_size]
+        samples = []
+        for t in chunk:
+            c = np.asarray(t, dtype=np.float32).copy()
+            if len(c) > AGE_MAX_POINTS:  # FORage : 8192 points par arbre
+                c = c[rng.choice(len(c), AGE_MAX_POINTS, replace=False)]
+            samples.append(transform(dict(coord=c)))
+        batch = point_collate_fn(samples)
+        batch = {k: (v.to(device) if hasattr(v, "to") else v) for k, v in batch.items()}
+        with torch.no_grad():
+            pred = model(batch)["reg_logits"]
+        out[start:start + len(chunk)] = pred.reshape(-1).float().cpu().numpy()
+    return out
