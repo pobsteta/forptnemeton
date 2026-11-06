@@ -14,6 +14,11 @@ library(forptnemeton)
 forpt_environment()                  # ce qui manque (vide = prêt)
 emb <- forpt_embed("cache/layers/lidar_nuage_norm", aoi = ugf, resolution = 10)
 nemeton::indicateur_n5_distance_reference(ugf, embedding = emb)
+
+# âge structurel des arbres, puis par UGF (T1 désaturé)
+h <- nemeton::segment_houppiers(mnh, aoi = ugf)
+ugf <- forpt_age("cache/layers/lidar_nuage_norm", houppiers = h, units = ugf)
+nemeton::indicateur_t1_anciennete(ugf, age_structurel = "age_structurel")
 ```
 
 ## Environnement
@@ -27,6 +32,10 @@ d'installation de [LitePT](https://github.com/prs-eth/LitePT).
 
 ## Ce qu'il faut savoir
 
+- `forpt_age()` travaille **arbre par arbre**, comme la tête d'âge de ForPT
+  (FORage) : un houppier qui fusionne deux arbres est une mauvaise entrée.
+  Le repère des nuages d'arbres (x, y recentrés, z au-dessus du sol) est une
+  hypothèse à vérifier sur un échantillon FORage avant de croire les âges.
 - Le nuage doit être **normalisé** (hauteurs au-dessus du sol) ; un nuage
   d'altitudes est refusé.
 - Prétraitement identique aux configurations ForPT : recentrage, grille de

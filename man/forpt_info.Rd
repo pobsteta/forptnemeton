@@ -9,7 +9,8 @@ forpt_info()
 \value{
 A list: \code{version} of the embedding recipe, \code{dimensions} (504),
 \code{grid_size} (0.05 m), \code{hf_repo}, \code{weights_file} (path of the pretrained
-backbone inside the Hugging Face repository).
+backbone inside the Hugging Face repository), \code{age_weights_file} (the
+fine-tuned age head of \code{\link[=forpt_age]{forpt_age()}}).
 }
 \description{
 Constants of the ForPT encoder used by \code{\link[=forpt_embed]{forpt_embed()}}: the pretrained

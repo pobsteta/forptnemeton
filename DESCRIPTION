@@ -1,6 +1,6 @@
 Package: forptnemeton
 Title: ForPT Embeddings of LiDAR Point Clouds for 'nemeton'
-Version: 2026.11.1
+Version: 2026.11.2
 Authors@R:
     person("Pascal", "Obstétar", , "pascal.obstetar@gmail.com", role = c("aut", "cre"))
 Description: Turns a normalised airborne LiDAR point cloud into a raster of

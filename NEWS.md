@@ -1,3 +1,16 @@
+# forptnemeton 2026.11.2
+
+- `forpt_age(nuage, houppiers, units)` : âge structurel de chaque arbre par
+  la tête d'âge de ForPT (affinée sur FORage, un nuage par arbre), à partir
+  des retours de son houppier (par exemple `nemeton::segment_houppiers()`),
+  puis médiane et quartiles par UGF, prêts pour
+  `nemeton::indicateur_t1_anciennete(age_structurel =)` (T1 désaturé).
+  Nuage d'arbre recentré en x, y, z = hauteur au-dessus du sol, au plus
+  8 192 points : **hypothèse de repère à vérifier** sur un échantillon
+  FORage, que le dépôt ForPT ne documente pas.
+- `forpt_weights(fichier =)` télécharge aussi la tête d'âge ;
+  `forpt_info()$age_weights_file`.
+
 # forptnemeton 2026.11.1
 
 - Première version (spec 067 de `nemeton`, chantier C).
