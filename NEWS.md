@@ -1,3 +1,14 @@
+# forptnemeton 2026.11.3
+
+- `forpt_age()` : nuages d'arbres mis dans le **repère de FORage** (minimum
+  à 0 sur chaque axe, coin de la boîte englobante à l'origine), vérifié sur
+  `pc.tar` du jeu `prs-eth/forpt-forage`. La version 2026.11.2 centrait x et
+  y sur la moyenne de l'arbre : les âges auraient été lus hors du repère
+  d'entraînement.
+- `forpt_age()` avertit que la tête d'âge a été entraînée sur des épicéas
+  et des pins de Norvège (FORage : 1 521 arbres, 1 à 348 ans) : l'âge des
+  autres essences est une extrapolation.
+
 # forptnemeton 2026.11.2
 
 - `forpt_age(nuage, houppiers, units)` : âge structurel de chaque arbre par

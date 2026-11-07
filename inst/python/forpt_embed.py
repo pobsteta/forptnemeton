@@ -149,8 +149,8 @@ def predict_ages(model, trees, batch_size=16, device="cuda"):
     """Age predit (annees) pour une liste de nuages d'arbres (tableaux n x 3).
 
     Le pretraitement de la configuration FORage ne recentre pas : les nuages
-    sont passes tels que les donne R (recentres en x, y sur l'arbre, z =
-    hauteur au-dessus du sol).
+    sont passes tels que les donne R, dans le repere de FORage (minimum a 0
+    sur chaque axe).
     """
     import torch
     from forpt.datasets.transform import Compose

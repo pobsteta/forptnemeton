@@ -52,15 +52,19 @@ spec 067 of nemeton): BD Foret and NDVI saturate at 100 and 120 years, a
 structural age does not.
 }
 \details{
-\strong{Tree clouds.} The returns inside a crown polygon, shifted so that x and
-y are centred on the tree, z left as the height above ground; at most 8,192
-points (random draw; FORage uses farthest-point sampling), sampled on a
-5 cm grid. The frame of the FORage training clouds is not documented in the
-ForPT repository: this one is an assumption to check on a FORage sample
-before trusting the ages.
+\strong{Tree clouds.} The returns inside a crown polygon, shifted so that their
+minimum is 0 on each axis (corner of the bounding box at the origin), which
+is the frame of the FORage training clouds (checked on \code{pc.tar}); at most
+8,192 points (random draw; FORage uses farthest-point sampling), sampled on
+a 5 cm grid.
+
+\strong{Training domain.} FORage holds 1,521 Norway spruce and Scots pine trees
+from Norway (aerial LiDAR HD, mobile and terrestrial scans), aged 1 to 348
+years (median 42). Ages of broadleaves and of other species are
+extrapolations; the function says so when it runs the ForPT head.
 
 \strong{Pitfalls} (fiche T1): a structural age is not an age; a stand on a poor
-site looks younger; FORage trees are not French; crowns from a 2D
+site looks younger; FORage trees are Norwegian conifers; crowns from a 2D
 segmentation cut or merge trees, and dominated trees are hidden; the age
 head is trained on single trees, a merged crown is a wrong input.
 }

@@ -27,15 +27,19 @@
 #'   (`NA` and 0 for a unit without dated tree).
 #'
 #' @details
-#' **Tree clouds.** The returns inside a crown polygon, shifted so that x and
-#' y are centred on the tree, z left as the height above ground; at most 8,192
-#' points (random draw; FORage uses farthest-point sampling), sampled on a
-#' 5 cm grid. The frame of the FORage training clouds is not documented in the
-#' ForPT repository: this one is an assumption to check on a FORage sample
-#' before trusting the ages.
+#' **Tree clouds.** The returns inside a crown polygon, shifted so that their
+#' minimum is 0 on each axis (corner of the bounding box at the origin), which
+#' is the frame of the FORage training clouds (checked on `pc.tar`); at most
+#' 8,192 points (random draw; FORage uses farthest-point sampling), sampled on
+#' a 5 cm grid.
+#'
+#' **Training domain.** FORage holds 1,521 Norway spruce and Scots pine trees
+#' from Norway (aerial LiDAR HD, mobile and terrestrial scans), aged 1 to 348
+#' years (median 42). Ages of broadleaves and of other species are
+#' extrapolations; the function says so when it runs the ForPT head.
 #'
 #' **Pitfalls** (fiche T1): a structural age is not an age; a stand on a poor
-#' site looks younger; FORage trees are not French; crowns from a 2D
+#' site looks younger; FORage trees are Norwegian conifers; crowns from a 2D
 #' segmentation cut or merge trees, and dominated trees are hidden; the age
 #' head is trained on single trees, a merged crown is a wrong input.
 #'
@@ -65,9 +69,16 @@ forpt_age <- function(nuage, houppiers, units = NULL, min_points = 50L,
   if (length(dates)) {
     groupes <- split(which(!is.na(arbre) & arbre %in% dates), factor(arbre[!is.na(arbre) & arbre %in% dates], levels = dates))
     nuages <- lapply(groupes, function(i) {
-      cbind(pts$X[i] - mean(pts$X[i]), pts$Y[i] - mean(pts$Y[i]), pts$Z[i])
+      # repere FORage : coordonnees ramenees a leur minimum sur les trois axes
+      # (coin de la boite englobante a l'origine), verifie sur pc.tar
+      cbind(pts$X[i] - min(pts$X[i]), pts$Y[i] - min(pts$Y[i]), pts$Z[i] - min(pts$Z[i]))
     })
-    if (is.null(predicteur)) predicteur <- .forpt_predicteur_age(weights, device, batch_size)
+    if (is.null(predicteur)) {
+      cli::cli_alert_warning(c(
+        "ForPT age head trained on Norwegian spruce and pine (FORage): ",
+        "ages of other species are extrapolations."))
+      predicteur <- .forpt_predicteur_age(weights, device, batch_size)
+    }
     a <- as.numeric(predicteur(unname(nuages)))
     if (length(a) != length(dates)) {
       cli::cli_abort("The age model returned {length(a)} values for {length(dates)} trees.")
