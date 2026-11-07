@@ -34,8 +34,9 @@ d'installation de [LitePT](https://github.com/prs-eth/LitePT).
 
 - `forpt_age()` travaille **arbre par arbre**, comme la tête d'âge de ForPT
   (FORage) : un houppier qui fusionne deux arbres est une mauvaise entrée.
-  Le repère des nuages d'arbres (x, y recentrés, z au-dessus du sol) est une
-  hypothèse à vérifier sur un échantillon FORage avant de croire les âges.
+  Les nuages d'arbres sont mis dans le repère de FORage (minimum à 0 sur
+  chaque axe, vérifié sur `pc.tar`). FORage ne contient que des épicéas et
+  des pins de Norvège : l'âge des feuillus est une extrapolation.
 - Le nuage doit être **normalisé** (hauteurs au-dessus du sol) ; un nuage
   d'altitudes est refusé.
 - Prétraitement identique aux configurations ForPT : recentrage, grille de

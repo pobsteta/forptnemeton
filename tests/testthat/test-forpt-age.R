@@ -24,12 +24,12 @@
 # predicteur factice : 3 x la hauteur maximale de l'arbre ; verifie le cadre
 .age_factice <- function(arbres) {
   vapply(arbres, function(m) {
-    stopifnot(abs(mean(m[, 1])) < 1e-8, abs(mean(m[, 2])) < 1e-8, min(m[, 3]) >= 0)
+    stopifnot(all(abs(apply(m, 2, min)) < 1e-8))   # repere FORage : minimum a 0
     3 * max(m[, 3])
   }, numeric(1))
 }
 
-test_that("forpt_age dates each crown from its own returns, recentred", {
+test_that("forpt_age dates each crown from its own returns, in the FORage frame", {
   h <- forpt_age(.nuage_arbres(), .houppiers(), min_points = 50, predicteur = .age_factice)
   expect_s3_class(h, "sf")
   expect_equal(h$n_points, c(300, 300, 300, 10))
